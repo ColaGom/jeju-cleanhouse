@@ -6,8 +6,9 @@ import {
   MarkerF,
   useLoadScript,
 } from "@react-google-maps/api";
+import _ from "lodash";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export type JejuMapProps = {
@@ -25,6 +26,26 @@ export const JejuMap = ({ items }: JejuMapProps) => {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
   });
 
+  const findNearest = useCallback(async () => {
+    const current: any = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const current = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setCenter(current);
+        resolve(current);
+      });
+    });
+
+    _.minBy(items, (item) => {
+      return (
+        Math.pow(current.lat - item.lat, 2) +
+        Math.pow(current.lng - item.lng, 2)
+      );
+    });
+  }, []);
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(function (position) {
       console.log(position);
@@ -36,22 +57,30 @@ export const JejuMap = ({ items }: JejuMapProps) => {
   return (
     <GoogleMap
       ref={map}
-      mapContainerClassName="h-full w-full"
+      mapContainerClassName="h-screen w-full"
       center={center}
       zoom={11}
     >
-      <div
-        className="absolute flex flex-row inset-x-0 bottom-0 mx-auto h-16 items-center justify-center"
-        onClick={() => {
-          navigator.geolocation.getCurrentPosition((position) => {
-            setCenter({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
+      <div className="absolute flex flex-col gap-3 inset-x-0 bottom-0 mx-auto items-center justify-center mb-4">
+        <button
+          className="bg-purple-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full"
+          onClick={() => {
+            findNearest();
+          }}
+        >
+          가까운 클린하우스
+        </button>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full"
+          onClick={() => {
+            navigator.geolocation.getCurrentPosition((position) => {
+              setCenter({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
             });
-          });
-        }}
-      >
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full">
+          }}
+        >
           현재위치보기
         </button>
       </div>
@@ -87,9 +116,7 @@ export const JejuMap = ({ items }: JejuMapProps) => {
               </button>
             </CopyToClipboard>
             <Link
-              href={
-                `https://map.kakao.com/link/to/${selected.address},${selected.lat},${selected.lng}`
-              }
+              href={`https://map.kakao.com/link/to/${selected.address},${selected.lat},${selected.lng}`}
               target="_blank"
             >
               <img src="btn_kakao_navi.png" style={{ cursor: "pointer" }} />

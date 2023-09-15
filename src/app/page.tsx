@@ -12,7 +12,7 @@ export default async function Home() {
   const data = await getData();
 
   return (
-    <main style={{ height: "100vh", width: "100%" }}>
+    <main>
       <JejuMap items={data} />
     </main>
   );
