@@ -33,17 +33,24 @@ export const JejuMap = ({ items }: JejuMapProps) => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-        setCenter(current);
         resolve(current);
       });
     });
 
-    _.minBy(items, (item) => {
-      return (
-        Math.pow(current.lat - item.lat, 2) +
-        Math.pow(current.lng - item.lng, 2)
-      );
-    });
+    if (current) {
+      const nearest = _.minBy(items, (item) => {
+        return (
+          Math.pow(current.lat - item.lat, 2) +
+          Math.pow(current.lng - item.lng, 2)
+        );
+      });
+
+      setCenter({
+        lat: nearest.lat,
+        lng: nearest.lng,
+      });
+      setSelected(nearest);
+    }
   }, []);
 
   useEffect(() => {
