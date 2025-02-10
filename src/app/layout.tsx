@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "제주도 클린하우스 찾기",
-  description: "Powered by Alphaca Labs",
+  description: "Powered by Alphaca Labs, https://www.alphaca.kr/ 알파카랩스",
 };
 
 export default function RootLayout({

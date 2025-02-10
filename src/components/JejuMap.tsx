@@ -7,6 +7,7 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 import _ from "lodash";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -64,7 +65,7 @@ export const JejuMap = ({ items }: JejuMapProps) => {
   return (
     <GoogleMap
       ref={map}
-      mapContainerClassName="h-screen w-full"
+      mapContainerClassName="flex-1 w-full"
       center={center}
       zoom={11}
     >
@@ -112,8 +113,8 @@ export const JejuMap = ({ items }: JejuMapProps) => {
             lng: parseFloat(selected.lng),
           }}
         >
-          <div className="flex flex-col p-4 gap-4">
-            <p className="text-lg">{selected.address}</p>
+          <div className="flex flex-col p-4 gap-4 text-black">
+            <p className="text-lg ">{selected.address}</p>
             <CopyToClipboard text={selected.address} onCopy={() => {}}>
               <button
                 type="button"
@@ -122,12 +123,27 @@ export const JejuMap = ({ items }: JejuMapProps) => {
                 Copy
               </button>
             </CopyToClipboard>
-            <Link
-              href={`https://map.kakao.com/link/to/${selected.address},${selected.lat},${selected.lng}`}
-              target="_blank"
-            >
-              <img src="btn_kakao_navi.png" style={{ cursor: "pointer" }} />
-            </Link>
+            <div className="flex gap-1">
+              <Link
+                href={`https://map.kakao.com/link/to/${selected.address},${selected.lat},${selected.lng}`}
+                target="_blank"
+                className="w-12 h-12 relative cursor-pointer"
+              >
+                <Image fill alt="kakao map" src="/btn_kakao_navi.png" />
+              </Link>
+              <Link
+                href={`https://map.naver.com/?lng=${selected.lng}&lat=${selected.lat}&title=${selected.address}`}
+                target="_blank"
+                className="w-12 h-12 relative cursor-pointer"
+              >
+                <Image
+                  fill
+                  alt="naver map"
+                  src="/btn_naver_navi.png"
+                  style={{ cursor: "pointer" }}
+                />
+              </Link>
+            </div>
           </div>
         </InfoWindowF>
       )}
